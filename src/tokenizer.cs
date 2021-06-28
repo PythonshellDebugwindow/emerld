@@ -9,10 +9,13 @@ namespace Emerld
     
     private static void AddAndResetCurToken()
     {
-      tokens.Add(new Token(curToken));
+      if(curToken == "if")
+        tokens.Add(new Token(curToken, TokenType.IF));
+      else
+        tokens.Add(new Token(curToken));
       curToken = "";
     }
-
+    
     public static List<Token> Tokenize(string program)
     {
       tokens = new List<Token>();
@@ -25,14 +28,13 @@ namespace Emerld
         if(curChar == '"' && !stringMode)
           stringMode = true;
         
-        if(/*wasUsingS*/stringMode)
+        if(stringMode)
         {
           if(curToken.Length > 0 && curChar == '"'
              && !wasUsingStringMode)
             AddAndResetCurToken();
           
           curToken += curChar;
-          System.Console.WriteLine("String := "+curToken);
           if(curChar == '"' && wasUsingStringMode)
           {
             AddAndResetCurToken();
@@ -47,7 +49,10 @@ namespace Emerld
               AddAndResetCurToken();
           }
           else if(curToken == ""
-            || Util.GetTokenType(curToken) == Util.GetTokenType(curChar))
+            || (Util.GetTokenType(curToken) == TokenType.ID
+                && char.IsDigit(curChar))
+            || (Util.GetTokenType(curToken) == Util.GetTokenType(curChar)
+                && !Util.IsSingle(curToken)))
           {
             curToken += curChar;
           }
@@ -60,6 +65,9 @@ namespace Emerld
       }
       if(curToken.Length > 0)
         AddAndResetCurToken();
+      
+      if(tokens.Count == 0)
+        Errors.ProgramIsEmpty();
       
       foreach(Token t in tokens)
       {

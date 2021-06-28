@@ -6,6 +6,7 @@ namespace Emerld
     STRING,
     ID,
     OP,
+    IF,
     ASSIGN,
     BRACE_OPEN,
     BRACE_CLOSE,
